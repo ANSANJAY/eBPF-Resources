@@ -20,3 +20,41 @@ The eBPF verifier is a crucial component in the Linux kernel that ensures eBPF p
 7. **Program Execution**: Once loaded and optionally JIT-compiled, the eBPF program is ready to be attached to a specific hook point in the kernel (such as a network interface, tracepoint, or system call) and executed in response to relevant events.
 
 The eBPF verifier plays a critical role in maintaining the integrity and security of the Linux kernel, ensuring that only safe and well-behaved eBPF programs are allowed to run.
+
+
+```
++---------------------+      +-----------------+      +------------------+
+| Write eBPF Program  | ---> | Compile Program | ---> | eBPF Bytecode    |
+| in High-Level Lang  |      | (Clang/LLVM)    |      | (Machine Code)   |
++---------------------+      +-----------------+      +------------------+
+                                                                  |
+                                                                  v
+                                                        +------------------+
+                                                        | bpf() System Call |
+                                                        | (Load Program)   |
+                                                        +------------------+
+                                                                  |
+                                                                  v
+                                                        +------------------+
+                                                        | eBPF Verifier    |
+                                                        | (Check Safety)   |
+                                                        +------------------+
+                                                                  |
+                                                                  |
+    +------------------------+     +---------------+     +----------------+
+    | Program Rejected       |<--No|               |Yes  | Program Loaded |
+    | (Unsafe or Non-compliant)|    |               |     | and Optional   |
+    |                         |    |               |     | JIT Compilation|
+    +------------------------+     +---------------+     +----------------+
+```
+
+In this flow:
+
+1. You start by writing your eBPF program in a high-level language like C.
+2. You then use a compiler (typically Clang with the LLVM backend) to compile the program into eBPF bytecode.
+3. The compiled eBPF bytecode is loaded into the Linux kernel using the `bpf()` system call.
+4. The eBPF verifier in the kernel is automatically triggered to analyze the bytecode, checking for safety and compliance with security policies.
+5. If the verifier approves the program, it is loaded into the kernel, and optional Just-In-Time (JIT) compilation may occur to convert the bytecode into native machine code for improved performance.
+6. If the verifier rejects the program (due to safety concerns or non-compliance), it is not loaded, and an error is returned.
+
+This process ensures that only safe and verified eBPF programs are allowed to run within the kernel, maintaining system integrity and security.
