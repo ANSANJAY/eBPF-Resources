@@ -1,5 +1,3 @@
-# eBPF-Resources
-
 # eBPF Resources :rocket:
 
 Welcome to the ultimate collection of resources, tools, and tutorials on eBPF (Extended Berkeley Packet Filter)! :books:
